@@ -23,3 +23,12 @@ app.listen(3000, ()=>{
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use((err,req,res,next)=>{
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Maybe error on our side :(';
+    res.status(statusCode).json({
+        success:false,
+        statusCode,
+        message
+    })
+})
