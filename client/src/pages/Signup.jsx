@@ -15,7 +15,7 @@ export default function Signup() {
           </Link>
           <p className='text-lg mt-5'>
             Unlock a world of stories waiting to unfold.
-            SignUp for our community..!
+            SignUp for our community and be a dragon..!
           </p>
         </div>
         {/* right */}
