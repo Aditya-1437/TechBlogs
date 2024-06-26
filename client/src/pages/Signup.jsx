@@ -75,7 +75,7 @@ export default function Signup() {
             <Button gradientDuoTone='purpleToPink' type='submit' disabled={loading}>
               {loading ? (<><Spinner size='sm' /><span className='pl-3'>Loading...</span></>) : 'Become the Dragon'}
             </Button>
-            <OAuth />
+            {/* <OAuth /> */}
           </form>
           <div className='flex gap-2 text-sm mt-3'>
             <span>Already a dragon?</span>

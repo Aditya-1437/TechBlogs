@@ -1,12 +1,18 @@
-import { Button, Navbar, TextInput } from 'flowbite-react'
+import { Avatar, Button, Dropdown, Navbar, TextInput } from 'flowbite-react'
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {AiOutlineSearch} from 'react-icons/ai'
 import { FaMoon } from "react-icons/fa";
+import {useSelector} from 'react-redux';
+import { AiOutlineLogout } from "react-icons/ai";
+import { GiExitDoor } from "react-icons/gi";
 
 export default function Header() {
 
     const path = useLocation().pathname;
+    const {currentuser} = useSelector(state => state.user)
+    console.log(currentuser)
+    
 
   return (
     <Navbar className='border-b-2'>
@@ -31,11 +37,46 @@ export default function Header() {
             <Button className='w-12 h-10 hidden sm:inline' color='gray' pill>
                 <FaMoon />
             </Button>
-            <Link to='/sign-in'>
-                <Button gradientDuoTone='purpleToBlue' outline>
-                    Sign In
-                </Button>
-            </Link>
+            {currentuser ? (
+                <Dropdown arrowIcon={false}
+                inline
+                label={
+                    <Avatar
+                    alt='user'
+                    img={currentuser.profilePicture}
+                    rounded
+                    />
+                }
+                >
+                    <Dropdown.Header>
+                        <span className='block text-sm'>
+                            Dragon Id : {currentuser.username}
+                        </span>
+                        <span className='block text-sm font-medium truncate'>
+                            E-Mail : {currentuser.email}
+                        </span>
+                    </Dropdown.Header>
+
+                    <Link to='/dashboard?tab=profile'>
+                        <Dropdown.Item>Profile</Dropdown.Item>
+                    </Link>
+                    <Dropdown.Divider className='bg-purple-600' />
+                    <Dropdown.Item className='bg-red-600 text-white font-bold'>Leave the Nest 
+                        <GiExitDoor className='w-6 h-6 ml-7'/>
+                    </Dropdown.Item>
+
+                </Dropdown>
+            ):
+            
+                (
+
+                    <Link to='/sign-in'>
+                        <Button gradientDuoTone='purpleToBlue' outline>
+                            Sign In
+                        </Button>
+                    </Link>
+                )
+            }
             <Navbar.Toggle />
         </div>
             <Navbar.Collapse>
