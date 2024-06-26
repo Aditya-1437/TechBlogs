@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Link, json, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+import OAuth from '../components/OAuth';
 
 export default function Signin() {
 
@@ -74,6 +75,7 @@ export default function Signin() {
             <Button gradientDuoTone='purpleToPink' type='submit' disabled={loading}>
               {loading ? (<><Spinner size='sm' /><span className='pl-3'>Loading...</span></>) : 'Enter the Dungeon'}
             </Button>
+            <OAuth />
           </form>
           <div className='flex gap-2 text-sm mt-3'>
             <span>Not a dragon yet..?</span>
