@@ -64,7 +64,8 @@ export default function Header() {
                         <Dropdown.Item>Profile</Dropdown.Item>
                     </Link>
                     <Dropdown.Divider className='bg-purple-600' />
-                    <Dropdown.Item className='bg-red-600 text-white font-bold'>Leave the Nest 
+                    <Dropdown.Item className='bg-red-600 text-white font-bold hover:text-red-600'>
+                        Leave the Nest 
                         <GiExitDoor className='w-6 h-6 ml-7'/>
                     </Dropdown.Item>
 
