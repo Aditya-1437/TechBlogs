@@ -14,7 +14,6 @@ export default function Header() {
     const {currentuser} = useSelector(state => state.user)
     const dispatch = useDispatch();
     const {theme} = useSelector((state) => state.theme)
-    console.log(currentuser)
     
 
   return (
