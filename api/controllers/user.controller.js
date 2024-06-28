@@ -30,6 +30,7 @@ export const updateUser = async (req, res, next) => {
         if(req.body.username !== req.body.username.toLowerCase()){
             return next(errorHandler(400, 'Dragon Id allows no upper case characters!'))
         }
+    }
         // if(req.body.username.match(/^[a-zA-Z0-9]+$/)){
         //     return next(errorHandler(400, 'Dragon Id allows no Special Characters!'));
         // }
@@ -47,5 +48,5 @@ export const updateUser = async (req, res, next) => {
         } catch (error) {
             next(error)
         }
-    }
+    
 }

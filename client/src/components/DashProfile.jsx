@@ -7,6 +7,8 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { useDispatch } from 'react-redux';
 
 
 export default function DashProfile() {
@@ -15,7 +17,50 @@ export default function DashProfile() {
     const [imageFileURL, setImageFileURL] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
     const [imageFileUploadError, setImageFileUploadError] = useState(null);
-    const filePickerReference = useRef()
+    const [formData, setFormData] = useState({});
+    const [imageFileUploading, setImageFileUploading] = useState(false);
+    const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
+    const [updateUserError, setUpdateUserError] = useState(null);
+    const filePickerReference = useRef();
+    const dispatch = useDispatch();
+
+    const handelChange = (e)=>{
+        setFormData({...formData, [e.target.id]:e.target.value})
+    };
+    
+
+    const handelSubmit = async (e)=>{
+        e.preventDefault();
+        setUpdateUserSuccess(null);
+        setUpdateUserError(null);
+        if(Object.keys(formData).length === 0){
+            setUpdateUserError('Nothing New to Change!')
+            return;
+        }
+        if(imageFileUploading){
+            setUpdateUserError('Dragon! No need to hurry')
+            return;
+        }
+        try {
+            dispatch(updateStart());
+            const res = await fetch(`/api/users/update/${currentuser._id}`, {
+                method: 'PUT',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if(!res.ok){
+                dispatch(updateFailure(data.message));
+                setUpdateUserError(data.message)
+            }else{
+                dispatch(updateSuccess(data));
+                setUpdateUserSuccess("Dragon Identity Updated!");
+            }
+        } catch (error) {
+            dispatch(updateFailure(error.message));
+            setUpdateUserError(error.message);
+        }
+    }
 
     const handelImageChange = (e)=>{
         const file = e.target.files[0]
@@ -40,6 +85,7 @@ export default function DashProfile() {
         //       }
         //     }
         //   }
+        setImageFileUploading(true)
         setImageFileUploadError(null)
         const storage = getStorage(app);
         const fileName = new Date().getTime() + imageFile.name;
@@ -56,10 +102,13 @@ export default function DashProfile() {
                 setImageFileUploadProgress(null)
                 setImageFile(null)
                 setImageFileURL(null)
+                setImageFileUploading(false)
             },
             ()=>{
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL)=>{
                     setImageFileURL(downloadURL)
+                    setFormData({...formData, profilePicture:downloadURL});
+                    setImageFileUploading(false)
                 });
             }
         )
@@ -68,7 +117,7 @@ export default function DashProfile() {
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
         <h1 className='my-6 text-center font-bold text-3xl'>Profile</h1>
-        <form className='flex flex-col gap-5'>
+        <form onSubmit={handelSubmit} className='flex flex-col gap-5'>
             <input type="file" accept='image/*' onChange={handelImageChange} ref={filePickerReference} hidden />
             
             <div className="relative w-32 h-32 self-center cursor-pointer overflow-hidden rounded-full" onClick={()=>{filePickerReference.current.click()}}>
@@ -99,17 +148,27 @@ export default function DashProfile() {
                 {imageFileUploadError}
             </Alert>
             )}
-            <TextInput type='text' id='username' placeholder='Change Dragon Identity' defaultValue={currentuser.username} />
-            <TextInput type='email' id='email' placeholder='Change Dragon email' defaultValue={currentuser.email} />
-            <TextInput type='password' id='password' placeholder='Change Dragon password' />
+            <TextInput type='text' id='username' placeholder='Change Dragon Identity' defaultValue={currentuser.username} onChange={handelChange} />
+            <TextInput type='email' id='email' placeholder='Change Dragon email' defaultValue={currentuser.email} onChange={handelChange} />
+            <TextInput type='password' id='password' placeholder='Change Dragon password' onChange={handelChange} />
             <Button type='submit' gradientDuoTone='purpleToBlue' outline>
                 Update Identity
             </Button>
-            <div className="flex justify-between text-red-600">
-                <span className='cursor-pointer'><MdDeleteOutline />Delete Your Dragon Account</span>
-                <span className='cursor-pointer'><FiLogOut /> Exit the Nest</span>
-            </div>
         </form>
+            <div className="flex justify-between text-red-600 mt-3">
+                <span className='cursor-pointer w-full'><MdDeleteOutline />Delete Your Dragon Account</span>
+                <span className='cursor-pointer w-36'><FiLogOut /> Exit the Nest</span>
+            </div>
+            {updateUserSuccess && 
+            <Alert color='success' className='mt-5'>
+                {updateUserSuccess}
+            </Alert>
+            }
+            {updateUserError && 
+            <Alert color='failure' className='mt-5'>
+                {updateUserError}
+            </Alert>
+            }
     </div>
   )
 }
