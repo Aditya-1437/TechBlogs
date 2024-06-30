@@ -1,18 +1,19 @@
-import { Alert, Button, TextInput } from 'flowbite-react'
+import { Alert, Button, Modal, ModalBody, ModalHeader, TextInput } from 'flowbite-react'
 import React, { useEffect, useRef, useState } from 'react'
 import {useSelector} from 'react-redux'
 import { FiLogOut } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
+import { SiInformatica } from "react-icons/si";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure, deleteStart, deleteSuccess, deleteFailure } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 
 
 export default function DashProfile() {
-    const {currentuser}  = useSelector((state)=>state.user);
+    const {currentuser,error}  = useSelector((state)=>state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileURL, setImageFileURL] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -21,6 +22,7 @@ export default function DashProfile() {
     const [imageFileUploading, setImageFileUploading] = useState(false);
     const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
     const [updateUserError, setUpdateUserError] = useState(null);
+    const [showModal, setShowModel] = useState(false)
     const filePickerReference = useRef();
     const dispatch = useDispatch();
 
@@ -112,6 +114,24 @@ export default function DashProfile() {
                 });
             }
         )
+    };
+    const handelDelete = async ()=>{
+        setShowModel(false);
+        try {
+            dispatch(deleteStart());
+            const res = await fetch(`/api/users/delete/${currentuser._id}`,{
+                method:'DELETE',
+
+            });
+            const data = await res.json();
+            if(!res.ok){
+                dispatch(deleteFailure(data.message));
+            }else{
+                dispatch(deleteSuccess(data))
+            }
+        } catch (error) {
+            dispatch(deleteFailure(error.message))
+        }
     }
 
   return (
@@ -156,7 +176,7 @@ export default function DashProfile() {
             </Button>
         </form>
             <div className="flex justify-between text-red-600 mt-3">
-                <span className='cursor-pointer w-full'><MdDeleteOutline />Delete Your Dragon Account</span>
+                <span onClick={()=>setShowModel(true)} className='cursor-pointer w-full'><MdDeleteOutline />Delete Your Dragon Account</span>
                 <span className='cursor-pointer w-36'><FiLogOut /> Exit the Nest</span>
             </div>
             {updateUserSuccess && 
@@ -169,6 +189,25 @@ export default function DashProfile() {
                 {updateUserError}
             </Alert>
             }
+            {error && 
+            <Alert color='failure' className='mt-5'>
+                {error}
+            </Alert>
+            }
+            <Modal show={showModal} onClose={()=>setShowModel(false)} popup size='md'>
+                <ModalHeader />
+                    <ModalBody>
+                        <div className="text-center">
+                            <SiInformatica className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
+                            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Dragon, are you sure about this?</h3>
+                            <div className="flex justify-center gap-4">
+                                <Button color='failure' onClick={handelDelete}>Yes, do it.</Button>
+                                <Button color='success' onClick={()=>setShowModel(false)}>No, a wrong choise</Button>
+                            </div>
+                        </div>
+                    </ModalBody>
+                
+            </Modal>
     </div>
   )
 }
