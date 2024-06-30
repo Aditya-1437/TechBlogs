@@ -7,6 +7,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import { AiOutlineLogout } from "react-icons/ai";
 import { GiExitDoor } from "react-icons/gi";
 import { toggleTheme } from '../redux/theme/themeSlice';
+import { signoutSuccess } from '../redux/user/userSlice';
+
 
 export default function Header() {
 
@@ -14,6 +16,22 @@ export default function Header() {
     const {currentuser} = useSelector(state => state.user)
     const dispatch = useDispatch();
     const {theme} = useSelector((state) => state.theme)
+
+    const handelSignout = async ()=>{
+        try {
+            const res = await fetch('/api/users/signout',{
+                method:'POST',
+            });
+            const data = await res.json();
+            if(!res.ok){
+                console.log(data.message);
+            }else{
+                dispatch(signoutSuccess());
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+    };
     
 
   return (
@@ -63,7 +81,7 @@ export default function Header() {
                         <Dropdown.Item>Profile</Dropdown.Item>
                     </Link>
                     <Dropdown.Divider className='bg-purple-600' />
-                    <Dropdown.Item className='bg-red-600 text-white font-bold hover:text-red-600'>
+                    <Dropdown.Item onClick={handelSignout} className='bg-red-600 text-white font-bold hover:text-red-600'>
                         Leave the Nest 
                         <GiExitDoor className='w-6 h-6 ml-7'/>
                     </Dropdown.Item>
