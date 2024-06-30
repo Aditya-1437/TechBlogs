@@ -34,13 +34,16 @@ export default function DashProfile() {
     const handelSubmit = async (e)=>{
         e.preventDefault();
         setUpdateUserSuccess(null);
+        setImageFileUploadProgress(null);
         setUpdateUserError(null);
         if(Object.keys(formData).length === 0){
             setUpdateUserError('Nothing New to Change!')
+            setTimeout(()=>{setUpdateUserError(null)},5000)
             return;
         }
         if(imageFileUploading){
             setUpdateUserError('Dragon! No need to hurry')
+            setTimeout(()=>{setUpdateUserError(null)},5000)
             return;
         }
         try {
@@ -53,10 +56,12 @@ export default function DashProfile() {
             const data = await res.json();
             if(!res.ok){
                 dispatch(updateFailure(data.message));
-                setUpdateUserError(data.message)
+                setUpdateUserError(data.message);
+                setTimeout(()=>{setUpdateUserError(null)},5000);
             }else{
                 dispatch(updateSuccess(data));
                 setUpdateUserSuccess("Dragon Identity Updated!");
+                setTimeout(()=>{setUpdateUserSuccess(null)},5000);
             }
         } catch (error) {
             dispatch(updateFailure(error.message));
@@ -98,6 +103,7 @@ export default function DashProfile() {
             (snapshot)=>{
                 const progress = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
                 setImageFileUploadProgress(progress.toFixed(0));
+                
             },
             (error)=>{
                 setImageFileUploadError('Image Uploading Error (File Size > 2MB [Recomended:<2MB])');
@@ -175,7 +181,7 @@ export default function DashProfile() {
                     />
                 )}
                 <img src={imageFileURL || currentuser.profilePicture} alt="user" 
-                className={`rounded-full w-full h-full object-cover border-8 ${imageFileUploadProgress && imageFileUploadProgress<100 && 'opacity-50'}`} />
+                className={`rounded-full w-full h-full object-cover border-8 ${(imageFileUploadProgress && imageFileUploadProgress<100 && 'opacity-50')}`} />
 
             </div>
             {imageFileUploadError && (       
@@ -188,6 +194,7 @@ export default function DashProfile() {
             <TextInput type='password' id='password' placeholder='Change Dragon password' onChange={handelChange} />
             <Button type='submit' gradientDuoTone='purpleToBlue' outline>
                 Update Identity
+                
             </Button>
         </form>
             <div className="flex justify-between text-red-600 mt-3">
