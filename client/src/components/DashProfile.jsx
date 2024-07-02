@@ -10,10 +10,13 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { updateStart, updateSuccess, updateFailure, deleteStart, deleteSuccess, deleteFailure, signoutSuccess } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
+import { FaEnvelopeOpenText } from "react-icons/fa";
+import { GrUpdate } from "react-icons/gr";
+import { Link } from 'react-router-dom';
 
 
 export default function DashProfile() {
-    const {currentuser,error}  = useSelector((state)=>state.user);
+    const {currentuser,error, loading}  = useSelector((state)=>state.user);
     const [imageFile, setImageFile] = useState(null);
     const [imageFileURL, setImageFileURL] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -192,10 +195,18 @@ export default function DashProfile() {
             <TextInput type='text' id='username' placeholder='Change Dragon Identity' defaultValue={currentuser.username} onChange={handelChange} />
             <TextInput type='email' id='email' placeholder='Change Dragon email' defaultValue={currentuser.email} onChange={handelChange} />
             <TextInput type='password' id='password' placeholder='Change Dragon password' onChange={handelChange} />
-            <Button type='submit' gradientDuoTone='purpleToBlue' outline>
-                Update Identity
+            <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled={loading || imageFileUploading}>
+            <GrUpdate className='w-2 h-2 m-2 justify-center' />
+                {loading ? 'Loading...' : 'Update Identity'}
                 
             </Button>
+            {
+                currentuser.isAdmin && (
+                    <Link to={'/create-post'}>
+                    <Button type='button' gradientDuoTone='purpleToBlue' className='align-middle w-full'><FaEnvelopeOpenText className='w-4 h-4 mr-2 mt-auto' /> Create New Post</Button>
+                    </Link>
+                )
+            }
         </form>
             <div className="flex justify-between text-red-600 mt-3">
                 <span onClick={()=>setShowModel(true)} className='cursor-pointer w-full'><MdDeleteOutline />Delete Your Dragon Account</span>

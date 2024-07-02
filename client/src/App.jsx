@@ -9,6 +9,8 @@ import Projects from './pages/Projects';
 import Header from './components/Header';
 import Footerc from './components/Footer';
 import PrivsteRoute from './components/PrivsteRoute';
+import OnlyAdminPrivsteRoute from './components/OnlyAdminPrivsteRoute.jsx';
+import CreatePost from './pages/CreatePost';
 
 export default function App() {
   return (
@@ -21,6 +23,9 @@ export default function App() {
         <Route path='/sign-up' element={<Signup />} />
         <Route element={<PrivsteRoute />} >
           <Route path='/dashboard' element={<Dashboard />} />
+        </Route>
+        <Route element={<OnlyAdminPrivsteRoute />} >
+          <Route path='/create-post' element={<CreatePost />} />
         </Route>
         <Route path='/projects' element={<Projects />} />
       </Routes>
